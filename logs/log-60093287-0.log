@@ -1,0 +1,35 @@
+Imported libraries
+Loaded dataset
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:03<00:03,  3.78s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:05<00:00,  2.31s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:05<00:00,  2.53s/it]
+/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:492: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`. This was detected when initializing the generation config instance, which means the corresponding file may hold incorrect parameterization and should be fixed.
+  warnings.warn(
+/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:497: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`. This was detected when initializing the generation config instance, which means the corresponding file may hold incorrect parameterization and should be fixed.
+  warnings.warn(
+/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:492: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.9` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:497: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/trl/trainer/sft_trainer.py:245: UserWarning: You didn't pass a `max_seq_length` argument to the SFTTrainer, this will default to 1024
+  warnings.warn(
+/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 4.18.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+Setup model
+Initialized trainer
+Training model
+  0%|          | 0/9998 [00:00<?, ?it/s]  0%|          | 1/9998 [00:05<14:40:12,  5.28s/it]  0%|          | 2/9998 [00:07<9:10:54,  3.31s/it]   0%|          | 3/9998 [00:09<7:19:02,  2.64s/it]  0%|          | 4/9998 [00:10<6:27:44,  2.33s/it]  0%|          | 5/9998 [00:12<5:58:33,  2.15s/it]  0%|          | 6/9998 [00:14<5:41:40,  2.05s/it]  0%|          | 7/9998 [00:16<5:30:42,  1.99s/it]  0%|          | 8/9998 [00:18<5:22:44,  1.94s/it]  0%|          | 9/9998 [00:20<5:17:26,  1.91s/it]  0%|          | 10/9998 [00:21<5:14:39,  1.89s/it]  0%|          | 11/9998 [00:23<5:12:54,  1.88s/it]  0%|          | 12/9998 [00:25<5:13:11,  1.88s/it]  0%|          | 13/9998 [00:27<5:10:48,  1.87s/it]  0%|          | 14/9998 [00:29<5:09:09,  1.86s/it]  0%|          | 15/9998 [00:31<5:07:58,  1.85s/it]Traceback (most recent call last):
+  File "/sfs/weka/scratch/bae9wk/PCAPLM/finetune.py", line 75, in <module>
+    trainer.train()
+  File "/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/trl/trainer/sft_trainer.py", line 360, in train
+    output = super().train(*args, **kwargs)
+  File "/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/transformers/trainer.py", line 1780, in train
+    return inner_training_loop(
+  File "/project/CollabRoboGroup/bae9wk/pcaplm/lib/python3.9/site-packages/transformers/trainer.py", line 2120, in _inner_training_loop
+    if (
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+  0%|          | 15/9998 [00:32<5:57:49,  2.15s/it]

@@ -38,7 +38,7 @@ new_model = "llama-2-7b-chat-pcap"
 
 # Load dataset
 #dataset = load_dataset("csv", data_files=DATA_FILE, split='train')
-dataset = Dataset.from_pandas(get_pcap_dataframe())
+dataset = Dataset.from_pandas(get_pcap_dataframe(DATA_FILE))
 print("Loaded dataset")
 
 # 4-bit Quantization Configuration

@@ -1,10 +1,11 @@
 import pandas
+import argparse
 
 def serialize(entry):
     keys = entry.keys().drop(["Label"])
     prompt = ','.join([f"{key}:{entry[key]}" for key in keys])
-    label = entry["Label"]
-    return f"<s>[INST] {prompt} [/INST] {label} </s>"
+    label = "Yes, it is a SYN attack" if entry["Label"]=="SYN" else "No, it is a benign packet."
+    return f"<s>[INST] Given the following information, is this packet a SYN attack?: [{prompt}] [/INST] {label} </s>"
 
 def get_pcap_dataframe(path):
     df = pandas.read_csv(path, dtype=str)
@@ -17,5 +18,14 @@ def get_pcap_dataframe(path):
     
     return df.loc[:, ['text']]
 
-#DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/Syn.csv'
-#get_pcap_dataframe(DATA_FILE).to_csv('/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/reformatted_Syn.csv')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--save_to", type=str, default="", help="Path where the LLaMA-friendly dataset should be saved"
+    )
+    parser.add_argument(
+        "--read_from", type=str, default="", help="Path of raw CSV"
+    )
+    args = parser.parse_args()
+    if args.read_from and args.save_to:
+        get_pcap_dataframe(args.read_from).to_csv(args.save_to)

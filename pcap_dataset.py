@@ -1,10 +1,14 @@
 import pandas
 import argparse
 
+i = 0
 def serialize(entry):
+    global i
     keys = entry.keys().drop(["Label"])
     prompt = ','.join([f"{key}:{entry[key]}" for key in keys])
-    label = "Yes, it is a SYN attack" if entry["Label"]=="SYN" else "No, it is a benign packet."
+    label = "Yes, it is a SYN attack" if entry["Label"].upper() =="SYN" else "No, it is a benign packet."
+    print(label, i)
+    i += 1
     return f"<s>[INST] Given the following information, is this packet a SYN attack?: [{prompt}] [/INST] {label} </s>"
 
 def get_pcap_dataframe(path):

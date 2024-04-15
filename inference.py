@@ -1,6 +1,10 @@
 from pcap_dataset import get_pcap_dataframe
 DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/small_syn.csv'
-CKPT = '/scratch/bae9wk/PCAPLM/results/checkpoint-44725'
+#CKPT = '/scratch/bae9wk/PCAPLM/results/checkpoint-44725'
+
+#CKPT = 'results/checkpoint-136750'
+#CKPT = "NousResearch/Llama-2-7b-chat-hf"
+CKPT = '/scratch/bae9wk/PCAPLM/results/checkpoint-9600'
 import os
 os.environ['HF_HOME'] = '/scratch/bae9wk/datasets/.cache/'
 
@@ -30,11 +34,14 @@ tokenizer.padding_side = "right"
 df = get_pcap_dataframe(DATA_FILE)
 
 logging.set_verbosity(logging.CRITICAL)
-delim = '[/INST]'
+end = '[/INST]'
 prompt = df.iloc[0]['text']
-prompt = prompt[: prompt.find(delim)+len(delim)]
+prompt = prompt[: prompt.find(end)+len(end)]
 
 print(prompt)
-pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=200)
+pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=len(prompt)+200)
 result = pipe(prompt)
+
 print(result[0]['generated_text'])
+    
+   # f"<s>[INST] Who is Leonardo Da Vinci? [/INST]"

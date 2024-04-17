@@ -43,10 +43,10 @@ def get_pcap_dataframe(path):
     for i in range(0, len(prompt_labels), 10):
         nxt = min(i+10, len(prompt_labels))
         combined = ''
-        label = 'Yes, it is a SYN attack'
+        label = 'No, it is a benign packet.'
         for j in range(i, nxt):
             combined += prompt_labels[j][0]
-            if not prompt_labels[j][1].startswith('Yes'):
+            if prompt_labels[j][1].startswith('Yes'):
                 label = prompt_labels[j][1]
         combinedList.append((f'PACKET 0-{nxt-i}: {combined} ', label))
     

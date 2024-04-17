@@ -1,13 +1,13 @@
 import pandas
 import argparse
 
-def combine(promptList):
+def combine(prompts_labels):
     def extract(entry):
         keys = entry.keys().drop(["Label"])
         prompt = ','.join([f"{key}:{entry[key]}" for key in keys])
         label = "Yes, it is a SYN attack" if entry["Label"].upper() == "SYN" else "No, it is a benign packet."
         text = f"<s>[INST] Given the following information, is there a SYN attack in any of the following packet flows?: [{prompt}] [/INST] {label} </s>"
-        promptList.append(prompt)
+        prompts_labels.append((prompt, label))
         return text
     return extract
 
@@ -36,19 +36,22 @@ def get_pcap_dataframe(path):
        'ctive_Mean', 'Active_Std', 'Active_Max', 'Active_Min', 'dle_Mean',
        'Idle_Std', 'Idle_Max', 'Idle_Min', 'imillarHTTP', 'Inbound'], axis=1)
 
-    promptList = []
-    df["text"] = df.apply(combine(promptList), axis=1)
+    prompt_labels = []
+    df["text"] = df.apply(combine(prompt_labels), axis=1)
 
     combinedList = []
-    for i in range(0, len(promptList), 10):
-        nxt = min(i+10, len(promptList))
+    for i in range(0, len(prompt_labels), 10):
+        nxt = min(i+10, len(prompt_labels))
         combined = ''
+        label = 'Yes, it is a SYN attack'
         for j in range(i, nxt):
-            combined += promptList[j]
-        combinedList.append(f'PACKET 0-{nxt-i}: {combined} ')
+            combined += prompt_labels[j][0]
+            if not prompt_labels[j][1].startswith('Yes'):
+                label = prompt_labels[j][1]
+        combinedList.append((f'PACKET 0-{nxt-i}: {combined} ', label))
     
-    # return df.loc[:, ['text']]
-    return pandas.Series(combinedList)
+    data = [f"<s>[INST] Given the following information, is there a SYN attack in any of the following packet flows?: [{prompt}] [/INST] {label} </s>" for prompt, label in combinedList]
+    return pandas.DataFrame(data=data, columns=['text'])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

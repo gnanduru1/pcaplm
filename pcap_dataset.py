@@ -1,21 +1,43 @@
 import pandas
 import argparse
+import os
+from tqdm.auto import tqdm
 
-def combine(prompts_labels):
-    def extract(entry):
-        keys = entry.keys().drop(["Label"])
-        prompt = ','.join([f"{key}:{entry[key]}" for key in keys])
-        label = "Yes, it is a SYN attack" if entry["Label"].upper() == "SYN" else "No, it is a benign packet."
-        text = f"<s>[INST] Given the following information, is there a SYN attack in any of the following packet flows?: [{prompt}] [/INST] {label} </s>"
-        prompts_labels.append((prompt, label))
-        return text
-    return extract
+def label_entry(entry):
+    keys = entry.keys().drop(["Label"])
+    prompt = ','.join([f"{key}:{entry[key]}" for key in keys])
+    label = "Yes, it is a SYN attack" if entry["Label"].upper() == "SYN" else "No, it is a benign packet."
+    text = f"<s>[INST] Given the following information, is there a SYN attack in any of the following packet flows?: [{prompt}] [/INST] {label} </s>"
+    return text
 
-def get_pcap_dataframe(path):
-    '''
-    Converts each line of the pcap dataset csv into a 10-packet window.
-    '''
-    df = pandas.read_csv(path, dtype=str)
+
+def load_dataframe_from_dir(path: str, nrows=None):
+    print(f'recursively loading dataframes from dir: {path}')
+    csv_files = []
+    for root, _, files in os.walk(path):
+        for name in files:
+            if name.endswith('.csv'):
+                csv_files.append(os.path.join(root, name))
+
+    csv_files = [file for file in csv_files if not 'venv' in file]
+
+    if len(csv_files) == 0:
+        raise ValueError(f'no CSV files in dir: {path}')
+    
+    dfs = []
+    for csv in tqdm(csv_files):
+        try:
+            dfs.append(pandas.read_csv(csv, dtype=str, nrows=nrows))
+        except pandas.errors.MergeError:
+            print(f'MergeError on {csv}')
+
+    return pandas.concat(dfs)
+
+
+def get_pcap_dataframe(path, nrows=None):
+    df = load_dataframe_from_dir(path, nrows)
+
+    print(f'formatting dataframe')
     df = df.rename(columns=lambda x: x.replace(' ', '_') if not x.startswith(' ') else x[1:].replace(' ', '_'))
 
     df = df.drop(['Unnamed:_0', 'Flow_ID',
@@ -36,22 +58,17 @@ def get_pcap_dataframe(path):
        'Active_Mean', 'Active_Std', 'Active_Max', 'Active_Min', 'Idle_Mean',
        'Idle_Std', 'Idle_Max', 'Idle_Min', 'SimillarHTTP', 'Inbound'], axis=1)
 
-    prompt_labels = []
-    df["text"] = df.apply(combine(prompt_labels), axis=1)
+    df = df.dropna(subset='Label')
+    mask = df['Label'] != 'Syn'
 
-    combinedList = []
-    for i in range(0, len(prompt_labels), 10):
-        nxt = min(i+10, len(prompt_labels))
-        combined = ''
-        label = 'No, it is a benign packet.'
-        for j in range(i, nxt):
-            combined += prompt_labels[j][0]
-            if prompt_labels[j][1].startswith('Yes'):
-                label = prompt_labels[j][1]
-        combinedList.append((f'PACKET 0-{nxt-i}: {combined} ', label))
-    
-    data = [f"<s>[INST] Given the following information, is there a SYN attack in any of the following packet flows?: [{prompt}] [/INST] {label} </s>" for prompt, label in combinedList]
-    return pandas.DataFrame(data=data, columns=['text'])
+    df = pandas.concat([df[df['Label'] == 'Syn'], df[df['Label'] == 'BENIGN']])
+
+    print(len(df[df['Label'] == 'BENIGN']) / len(df[df['Label'] == 'Syn']))
+
+    df["text"] = df.apply(label_entry, axis=1)
+
+    return pandas.DataFrame(data=df, columns=['text'])
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -59,8 +76,11 @@ if __name__ == '__main__':
         "--save_to", type=str, default="", help="Path where the LLaMA-friendly dataset should be saved"
     )
     parser.add_argument(
-        "--read_from", type=str, default="", help="Path of raw CSV"
+        "--read_from", type=str, default="", help="path to a directory to be recursively searched for CSV files"
+    )
+    parser.add_argument(
+        "--nrows", type=int, default=None, help="number of rows to read from each csv file"
     )
     args = parser.parse_args()
     if args.read_from and args.save_to:
-        get_pcap_dataframe(args.read_from).to_csv(args.save_to)
+        get_pcap_dataframe(args.read_from, args.nrows).to_csv(args.save_to)

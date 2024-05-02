@@ -63,9 +63,10 @@ def get_pcap_dataframe(path, nrows=None):
 
     df = pandas.concat([df[df['Label'] == 'Syn'], df[df['Label'] == 'BENIGN']])
 
-    print(len(df[df['Label'] == 'BENIGN']) / len(df[df['Label'] == 'Syn']))
+    print('percent BENIGN:', len(df[df['Label'] == 'BENIGN']) / len(df[df['Label'] == 'Syn']))
 
     df["text"] = df.apply(label_entry, axis=1)
+    df = df.dropna()
 
     return pandas.DataFrame(data=df, columns=['text'])
 

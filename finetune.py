@@ -1,5 +1,5 @@
 # Configure locations of huggingface cache and dataset
-DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/Syn.csv'
+DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/stratified.csv'
 import os
 os.environ['HF_HOME'] = '/scratch/bae9wk/datasets/.cache/'
 
@@ -61,7 +61,7 @@ peft_params = LoraConfig(lora_alpha=16, lora_dropout=0.1, r=64, bias="none", tas
 
 # Define training parameters
 pd = 1 #4
-training_params = TrainingArguments(output_dir="./results", num_train_epochs=1, per_device_train_batch_size=pd, gradient_accumulation_steps=1, optim="paged_adamw_32bit", save_steps=25, logging_steps=25, learning_rate=2e-4, weight_decay=0.001, fp16=False, bf16=False, max_grad_norm=0.3, max_steps=-1, warmup_ratio=0.03, group_by_length=True, lr_scheduler_type="constant", report_to="tensorboard")
+training_params = TrainingArguments(output_dir="./results/run3", num_train_epochs=1, per_device_train_batch_size=pd, gradient_accumulation_steps=1, optim="paged_adamw_32bit", save_steps=500, logging_steps=25, learning_rate=2e-5, weight_decay=0.001, fp16=False, bf16=False, max_grad_norm=0.3, max_steps=-1, warmup_ratio=0.03, group_by_length=True, lr_scheduler_type="polynomial", report_to="tensorboard")
 
 # Initialize the trainer
 trainer = SFTTrainer(model=model, train_dataset=dataset, peft_config=peft_params, dataset_text_field="text", max_seq_length=None, tokenizer=tokenizer, args=training_params, packing=False)

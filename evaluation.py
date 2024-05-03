@@ -1,4 +1,4 @@
-from pcap_dataset import get_pcap_dataframe
+from pcap_dataset import get_pcap_dataframe_legacy
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -10,7 +10,9 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/test_set.csv'
+# python evaluation.py --ckpt=results/run_update/checkpoint-10000 --eval_dir=analysis/test
+
+DATA_FILE = '/scratch/bae9wk/datasets/test_set.csv'
 CKPT = args.ckpt
 EVAL_DIR = args.eval_dir
 
@@ -44,7 +46,7 @@ tokenizer = AutoTokenizer.from_pretrained(CKPT, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
 
-df = get_pcap_dataframe(DATA_FILE)
+df = get_pcap_dataframe_legacy(DATA_FILE)
 df = df.iloc[::-1] # Read from the back (unseen) examples
 
 logging.set_verbosity(logging.CRITICAL)

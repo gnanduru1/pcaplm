@@ -1,5 +1,5 @@
 # Configure locations of huggingface cache and dataset
-DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/stratified.csv'
+DATA_FILE = '/scratch/bae9wk/datasets/syn-no-syn.csv'
 import os
 os.environ['HF_HOME'] = '/scratch/bae9wk/datasets/.cache/'
 
@@ -37,8 +37,8 @@ base_model = "NousResearch/Llama-2-7b-chat-hf"
 new_model = "llama-2-7b-chat-pcap"
 
 # Load dataset
-#dataset = load_dataset("csv", data_files=DATA_FILE, split='train')
-dataset = Dataset.from_pandas(get_pcap_dataframe(DATA_FILE))
+dataset = load_dataset("csv", data_files=DATA_FILE, split='train')
+#dataset = Dataset.from_pandas(get_pcap_dataframe(DATA_DIR))
 print("Loaded dataset")
 
 # 4-bit Quantization Configuration
@@ -60,8 +60,8 @@ tokenizer.padding_side = "right"
 peft_params = LoraConfig(lora_alpha=16, lora_dropout=0.1, r=64, bias="none", task_type="CAUSAL_LM")
 
 # Define training parameters
-pd = 1 #4
-training_params = TrainingArguments(output_dir="./results/run3", num_train_epochs=1, per_device_train_batch_size=pd, gradient_accumulation_steps=1, optim="paged_adamw_32bit", save_steps=500, logging_steps=25, learning_rate=2e-5, weight_decay=0.001, fp16=False, bf16=False, max_grad_norm=0.3, max_steps=-1, warmup_ratio=0.03, group_by_length=True, lr_scheduler_type="polynomial", report_to="tensorboard")
+pd = 4
+training_params = TrainingArguments(output_dir="./results/run_update2", num_train_epochs=1, per_device_train_batch_size=pd, gradient_accumulation_steps=1, optim="paged_adamw_32bit", save_steps=250, logging_steps=5, learning_rate=2e-5, weight_decay=0.001, fp16=False, bf16=False, max_grad_norm=0.3, max_steps=-1, warmup_ratio=0.03, group_by_length=True, lr_scheduler_type="polynomial", report_to="tensorboard")
 
 # Initialize the trainer
 trainer = SFTTrainer(model=model, train_dataset=dataset, peft_config=peft_params, dataset_text_field="text", max_seq_length=None, tokenizer=tokenizer, args=training_params, packing=False)

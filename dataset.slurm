@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 #SBATCH -A CollabRoboGroup
-#SBATCH --array=0-10
+#SBATCH --array=0
 #SBATCH -t 72:00:00
 #SBATCH -p standard
 #SBATCH -N 1

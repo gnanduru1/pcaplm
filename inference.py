@@ -1,13 +1,13 @@
 from pcap_dataset import get_pcap_dataframe
-DATA_FILE = '/scratch/bae9wk/datasets/PCAP/CSV-01-12/01-12/small_syn.csv'
+DATA_FILE = '/scratch/bae9wk/datasets/syn-no-syn.csv'
 #CKPT = '/scratch/bae9wk/PCAPLM/results/checkpoint-44725'
 
 #CKPT = 'results/checkpoint-136750'
 #CKPT = "NousResearch/Llama-2-7b-chat-hf"
-CKPT = '/scratch/bae9wk/PCAPLM/results/checkpoint-9600'
+CKPT = 'results/run_update/checkpoint-9750'
 import os
 os.environ['HF_HOME'] = '/scratch/bae9wk/datasets/.cache/'
-
+ 
 # Imports
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments, pipeline, logging
@@ -18,6 +18,9 @@ import gc
 from pcap_dataset import get_pcap_dataframe
 from datasets import Dataset, load_dataset
 
+dataset = load_dataset("csv", data_files=DATA_FILE, split='train')
+print(len(dataset))
+1/0
 
 
 compute_dtype = getattr(torch, "float16")
@@ -30,8 +33,6 @@ model.config.use_cache = False
 tokenizer = AutoTokenizer.from_pretrained(CKPT, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
-
-df = get_pcap_dataframe(DATA_FILE)
 
 logging.set_verbosity(logging.CRITICAL)
 end = '[/INST]'

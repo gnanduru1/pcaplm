@@ -1,7 +1,8 @@
 __pycache__
 results
 analysis
-
+*.eps
+*.png
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

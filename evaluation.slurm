@@ -1,14 +1,13 @@
 #!/bin/bash -l
 
 #SBATCH -A CollabRoboGroup
-#SBATCH --array=0
-#SBATCH -t 10:00:00
+#SBATCH --array=500,2500,5000,7500,9750
+#SBATCH -t 2:00:00
 #SBATCH -p gpu
-#SBATCH --gres=gpu:a100:4
-#SBATCH --constraint=a100_80gb
+#SBATCH --gres=gpu:a100:1
 #SBATCH -N 1
-#SBATCH --cpus-per-task=120
-#SBATCH --output=logs/log-%A-%a.log
+#SBATCH --cpus-per-task=30
+#SBATCH --output=logs/eval-%A-%a.log
 #SBATCH -J pcaplm
 # 125 is max cpus per task
 # #SBATCH --ntasks-per-node=1
@@ -18,6 +17,5 @@
 
 module purge
 module load anaconda
-conda deactivate
 conda activate pcaplm
-python finetune.py
+python evaluation.py --ckpt=results/run_update/checkpoint-${SLURM_ARRAY_TASK_ID} --eval_dir=analysis/checkpoint-${SLURM_ARRAY_TASK_ID}
